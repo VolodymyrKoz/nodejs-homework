@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
-const mongoose = require("../mongoose"); // Import the mongoose.js file where the database connection is established.
+const mongoose = require("../mongoose");
 
 const contactSchema = Joi.object({
   name: Joi.string().required(),
@@ -10,7 +10,6 @@ const contactSchema = Joi.object({
 });
 
 const Contact = mongoose.model("Contact", {
-  // Define your Mongoose Contact model here.
   name: String,
   email: String,
   phone: String,
