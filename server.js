@@ -1,5 +1,22 @@
-const app = require('./app')
+const express = require("express");
+const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const authenticateToken = require("./middleware/authenticateToken");
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000")
-})
+const app = express();
+
+mongoose.connect("mongodb://localhost/your-database-name", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+app.use(express.json());
+
+app.use("/users", authRoutes); 
+app.use("/users", authenticateToken, userRoutes);
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
