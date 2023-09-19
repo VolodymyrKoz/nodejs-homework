@@ -30,5 +30,10 @@ const authenticateToken = async (req, res, next) => {
     res.status(401).json({ message: "Not authorized" });
   }
 };
+const express = require('express');
+const app = express();
+
+// Налаштування роздачі статичних файлів з папки public
+app.use(express.static('public'));
 
 module.exports = authenticateToken;
