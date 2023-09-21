@@ -3,6 +3,7 @@ const logger = require("morgan");
 const cors = require("cors");
 const mongoose = require("./config/mongoose");
 const multer = require("multer");
+const fs = require("fs/promises"); // Import the 'fs/promises' module for file operations
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,7 +38,7 @@ app.use((err, req, res, next) => {
 // File Upload Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "tmp/"); // Store temporary files in the 'tmp' folder
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -47,8 +48,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // File Upload Route
-app.post("/upload", upload.single("file"), (req, res) => {
-  res.send("File uploaded successfully");
+app.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    // File processing logic here
+
+    // Move the processed file to the 'public/avatars' folder
+    const tmpFilePath = req.file.path;
+    const destinationPath = `public/avatars/${req.file.filename}`;
+    await fs.rename(tmpFilePath, destinationPath);
+
+    // Delete the 'tmp' folder (since the file has been successfully processed)
+    await fs.rm("tmp", { recursive: true });
+
+    res.send("File uploaded and processed successfully");
+  } catch (error) {
+    console.error("Error processing file:", error);
+    res.status(500).json({ message: "Error processing file" });
+  }
 });
 
 app.listen(port, () => {
